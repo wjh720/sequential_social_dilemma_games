@@ -48,3 +48,5 @@ CLEANUP_MAP = [
     '@RRRRR       BBBB@',
     '@HHHH       BBBBB@',
     '@@@@@@@@@@@@@@@@@@']
+
+AGENT_CHAR = 'P'

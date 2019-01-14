@@ -1,6 +1,7 @@
 import numpy as np
 import random
 
+from social_dilemmas.constants import AGENT_CHAR
 from social_dilemmas.constants import CLEANUP_MAP
 from social_dilemmas.envs.map_env import MapEnv, ACTIONS, ORIENTATIONS
 from social_dilemmas.envs.agent import CleanupAgent, CLEANUP_VIEW_SIZE
@@ -51,7 +52,7 @@ class CleanupEnv(MapEnv):
         self.stream_points = []
         for row in range(self.base_map.shape[0]):
             for col in range(self.base_map.shape[1]):
-                if self.base_map[row, col] == 'P':
+                if self.base_map[row, col] == AGENT_CHAR:
                     self.spawn_points.append([row, col])
                 elif self.base_map[row, col] == 'B':
                     self.apple_points.append([row, col])
@@ -136,7 +137,7 @@ class CleanupEnv(MapEnv):
     def append_hiddens(self, new_pos, old_char, new_char=None):
         """Add hidden cells to self.hidden_cells that should be put back when cleaning"""
         # an apple is gone once an agent walks over it
-        if old_char == 'A' and new_char == 'P':
+        if old_char == 'A' and new_char == AGENT_CHAR:
             self.hidden_cells.append(new_pos + [' '])
         # a waste cell is gone if a cleanup cell hits it
         if old_char == 'H' and new_char == 'C':
@@ -161,7 +162,7 @@ class CleanupEnv(MapEnv):
         spawn_points = []
         for i in range(len(self.apple_points)):
             row, col = self.apple_points[i]
-            if self.map[row, col] != 'P' and self.map[row, col] != 'A':
+            if self.map[row, col] != AGENT_CHAR and self.map[row, col] != 'A':
                 rand_num = np.random.rand(1)[0]
                 if rand_num < self.current_apple_spawn_prob:
                     spawn_points.append((row, col, 'A'))
@@ -171,7 +172,7 @@ class CleanupEnv(MapEnv):
             random.shuffle(self.waste_points)
             for i in range(len(self.waste_points)):
                 row, col = self.waste_points[i]
-                if self.map[row, col] != 'P' and self.map[row, col] != 'H':
+                if self.map[row, col] != AGENT_CHAR and self.map[row, col] != 'H':
                     rand_num = np.random.rand(1)[0]
                     if rand_num < self.current_waste_spawn_prob:
                         spawn_points.append((row, col, 'H'))
@@ -211,14 +212,14 @@ class CleanupEnv(MapEnv):
                 self.append_hiddens([row, col], 'H')
             # Don't spawn waste where an agent is standing or where
             # a cleaning beam is
-            elif self.map[row, col] != 'P' and self.map[row, col] != 'C':
+            elif self.map[row, col] != AGENT_CHAR and self.map[row, col] != 'C':
                 self.map[row, col] = 'H'
 
     def update_map_apples(self, new_apple_points):
         curr_agent_pos = [agent.get_pos().tolist() for agent in self.agents.values()]
         for i in range(len(new_apple_points)):
             row, col = new_apple_points[i]
-            if self.map[row, col] != 'P' and self.map[row, col] != 'F':
+            if self.map[row, col] != AGENT_CHAR and self.map[row, col] != 'F':
                 self.map[row, col] = 'A'
             # you can't spawn apples if an agent is there but hidden by a beam,
             elif self.map[row, col] == 'F' and [row, col] not in curr_agent_pos:

@@ -4,6 +4,8 @@ from gym.spaces import Box
 from gym.spaces import Discrete
 import numpy as np
 
+from social_dilemmas.constants import AGENT_CHAR
+
 # basic moves every agent should do
 BASE_ACTIONS = {0: 'MOVE_LEFT',  # Move left
                 1: 'MOVE_RIGHT',  # Move right

@@ -6,6 +6,8 @@ Code partially adapted from PyColab: https://github.com/deepmind/pycolab
 from ray.rllib.env import MultiAgentEnv
 import numpy as np
 import matplotlib.pyplot as plt
+
+from social_dilemmas.constants import AGENT_CHAR
 import utility_funcs as util
 
 ACTIONS = {'MOVE_LEFT': [-1, 0],  # Move left
@@ -98,7 +100,7 @@ class MapEnv(MultiAgentEnv):
         self.wall_points = []
         for row in range(self.base_map.shape[0]):
             for col in range(self.base_map.shape[1]):
-                if self.base_map[row, col] == 'P':
+                if self.base_map[row, col] == AGENT_CHAR:
                     self.spawn_points.append([row, col])
                 elif self.base_map[row, col] == '@':
                     self.wall_points.append([row, col])
@@ -290,7 +292,7 @@ class MapEnv(MultiAgentEnv):
                 # rotate the selected action appropriately
                 rot_action = self.rotate_action(selected_action, agent.get_orientation())
                 new_pos = agent.get_pos() + rot_action
-                self.reserved_slots.append((*new_pos, 'P', agent_id))
+                self.reserved_slots.append((*new_pos, AGENT_CHAR, agent_id))
             elif 'TURN' in action:
                 new_rot = self.update_rotation(action, agent.get_orientation())
                 agent.update_agent_rot(new_rot)
@@ -309,8 +311,8 @@ class MapEnv(MultiAgentEnv):
             pos = agent.get_pos()
             row, col = pos
             # TODO(ev) this rendering logic should not be done here)
-            self.map[row, col] = 'P'
-            self.append_hiddens(pos.tolist(), ' ', 'P')
+            self.map[row, col] = AGENT_CHAR
+            self.append_hiddens(pos.tolist(), ' ', AGENT_CHAR)
         self.build_walls()
         self.custom_reset()
 
@@ -337,7 +339,7 @@ class MapEnv(MultiAgentEnv):
         for i, hidden in enumerate(hidden_pos):
             # you can't put back hidden cells that an agent is on unless it is an agent that is
             # hidden
-            if hidden not in curr_agent_pos or hidden_char[i] == 'P':
+            if hidden not in curr_agent_pos or hidden_char[i] == AGENT_CHAR:
                 row, col = hidden
                 self.map[row, col] = hidden_char[i]
                 index = self.hidden_cells.index(hidden + [hidden_char[i]])
@@ -380,7 +382,7 @@ class MapEnv(MultiAgentEnv):
 
         for slot in self.reserved_slots:
             row, col = slot[0], slot[1]
-            if slot[2] == 'P':
+            if slot[2] == AGENT_CHAR:
                 agent_id = slot[3]
                 agent_moves[agent_id] = [row, col]
                 move_slots.append([row, col])
@@ -417,14 +419,14 @@ class MapEnv(MultiAgentEnv):
                         # only put back and delete elements that are not 'P'
                         found_index = 0
                         for index in search_rows:
-                            if hidden_char[index] != 'P':
+                            if hidden_char[index] != AGENT_CHAR:
                                 found_index = index
                                 break
                         self.map[old_pos[0], old_pos[1]] = self.hidden_cells[found_index][2]
                         del self.hidden_cells[found_index]
                         char = self.map[new_pos[0], new_pos[1]]
-                        self.append_hiddens(new_pos, char, 'P')
-                        self.map[new_pos[0], new_pos[1]] = 'P'
+                        self.append_hiddens(new_pos, char, AGENT_CHAR)
+                        self.map[new_pos[0], new_pos[1]] = AGENT_CHAR
                         # ------------------------------------
                         # remove all the other moves that would have conflicted
                         remove_indices = np.where((search_list == move).all(axis=1))[0]
@@ -486,14 +488,14 @@ class MapEnv(MultiAgentEnv):
                         # only put back and delete elements that are not 'P'
                         found_index = 0
                         for index in search_rows:
-                            if hidden_char[index] != 'P':
+                            if hidden_char[index] != AGENT_CHAR:
                                 found_index = index
                                 break
                         self.map[old_pos[0], old_pos[1]] = self.hidden_cells[found_index][2]
                         del self.hidden_cells[found_index]
                         char = self.map[new_pos[0], new_pos[1]]
-                        self.append_hiddens(new_pos, char, 'P')
-                        self.map[new_pos[0], new_pos[1]] = 'P'
+                        self.append_hiddens(new_pos, char, AGENT_CHAR)
+                        self.map[new_pos[0], new_pos[1]] = AGENT_CHAR
                         del agent_moves[agent_id]
                         del_keys.append(agent_id)
                         curr_agent_pos = [agent.get_pos().tolist() for agent in self.agents.values()]

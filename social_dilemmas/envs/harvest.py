@@ -1,7 +1,8 @@
 import numpy as np
 
-from social_dilemmas.envs.agent import HarvestAgent, HARVEST_VIEW_SIZE
+from social_dilemmas.constants import AGENT_CHAR
 from social_dilemmas.constants import HARVEST_MAP
+from social_dilemmas.envs.agent import HarvestAgent, HARVEST_VIEW_SIZE
 from social_dilemmas.envs.map_env import MapEnv, ACTIONS, ORIENTATIONS
 import utility_funcs as util
 
@@ -90,7 +91,7 @@ class HarvestEnv(MapEnv):
         """Add hidden cells to self.hidden_cells that should be put back when cleaning"""
         # an apple is gone once an agent walks over it
 
-        if old_char == 'A' and new_char == 'P':
+        if old_char == 'A' and new_char == AGENT_CHAR:
             self.hidden_cells.append(new_pos + [' '])
         else:
             self.hidden_cells.append(new_pos + [old_char])
@@ -107,7 +108,7 @@ class HarvestEnv(MapEnv):
         new_apple_points = []
         for i in range(len(self.apple_points)):
             row, col = self.apple_points[i]
-            if self.map[row, col] != 'P' and self.map[row, col] != 'A':
+            if self.map[row, col] != AGENT_CHAR and self.map[row, col] != 'A':
                 window = util.return_view(self.map, self.apple_points[i], APPLE_RADIUS, APPLE_RADIUS)
                 num_apples = self.count_apples(window)
                 spawn_prob = SPAWN_PROB[min(num_apples, 3)]
@@ -127,7 +128,7 @@ class HarvestEnv(MapEnv):
         curr_agent_pos = [agent.get_pos().tolist() for agent in self.agents.values()]
         for i in range(len(new_apple_points)):
             row, col = new_apple_points[i]
-            if self.map[row, col] != 'P' and self.map[row, col] != 'F':
+            if self.map[row, col] != AGENT_CHAR and self.map[row, col] != 'F':
                 self.map[row, col] = 'A'
             # you can't spawn apples if an agent is there but hidden by a beam,
             elif self.map[row, col] == 'F' and [row, col] not in curr_agent_pos:

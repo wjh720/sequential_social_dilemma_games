@@ -4,6 +4,8 @@ import numpy as np
 import unittest
 
 from gym.spaces import Discrete
+
+from social_dilemmas.constants import AGENT_CHAR
 from social_dilemmas.envs.agent import Agent
 from social_dilemmas.envs.agent import CleanupAgent
 from social_dilemmas.envs.agent import HarvestAgent
@@ -13,8 +15,10 @@ from social_dilemmas.envs.agent import CLEANUP_ACTIONS
 from social_dilemmas.envs.cleanup import CleanupEnv
 from social_dilemmas.envs.harvest import HarvestEnv
 from social_dilemmas.envs.map_env import MapEnv
-
 import utility_funcs as util
+
+# rewrite AGENT_CHAR to make testing easier
+AGENT_CHAR = 'P'
 
 # map actions to appropriate numbers
 ACTION_MAP = {y: x for x, y in BASE_ACTIONS.items()}
@@ -351,7 +355,7 @@ class TestMapEnv(unittest.TestCase):
         # check that stay works properly
         self.env.step({agent_id: ACTION_MAP['STAY']})
         np.testing.assert_array_equal(self.env.agents[agent_id].get_pos(), [2, 2])
-        self.assertEqual(self.env.map[2, 2], 'P')
+        self.assertEqual(self.env.map[2, 2], AGENT_CHAR)
 
         # quick test of stay
         self.env.step({agent_id: ACTION_MAP['STAY']})
@@ -509,7 +513,7 @@ class TestMapEnv(unittest.TestCase):
         self.assertTrue(within_bounds_1)
 
     def move_agent(self, agent_id, new_pos):
-        self.env.reserved_slots.append([new_pos[0], new_pos[1], 'P', agent_id])
+        self.env.reserved_slots.append([new_pos[0], new_pos[1], AGENT_CHAR, agent_id])
         self.env.execute_reservations()
         map_with_agents = self.env.get_map_with_agents()
         agent = self.env.agents[agent_id]
@@ -531,7 +535,7 @@ class TestMapEnv(unittest.TestCase):
         # FIXME(ev) hack for now to make agents appear
         char = self.env.map[start_pos[0], start_pos[1]]
         self.env.hidden_cells.append([start_pos[0], start_pos[1], char])
-        self.env.map[start_pos[0], start_pos[1]] = 'P'
+        self.env.map[start_pos[0], start_pos[1]] = AGENT_CHAR
         map_with_agents = env.get_map_with_agents()
         grid = util.return_view(map_with_agents, start_pos, view_len, view_len)
         self.env.agents[agent_id] = DummyAgent(agent_id, start_pos, start_orientation,
@@ -768,7 +772,7 @@ class TestHarvestEnv(unittest.TestCase):
         # FIXME(ev) hack for now to make agents appear
         char = self.env.map[start_pos[0], start_pos[1]]
         self.env.hidden_cells.append([start_pos[0], start_pos[1], char])
-        self.env.map[start_pos[0], start_pos[1]] = 'P'
+        self.env.map[start_pos[0], start_pos[1]] = AGENT_CHAR
         map_with_agents = env.get_map_with_agents()
         grid = util.return_view(map_with_agents, start_pos, view_len, view_len)
         self.env.agents[agent_id] = HarvestAgent(agent_id, start_pos, start_orientation,
@@ -781,7 +785,7 @@ class TestHarvestEnv(unittest.TestCase):
                                           agent.row_size, agent.col_size)
 
     def move_agent(self, agent_id, new_pos):
-        self.env.reserved_slots.append([new_pos[0], new_pos[1], 'P', agent_id])
+        self.env.reserved_slots.append([new_pos[0], new_pos[1], AGENT_CHAR, agent_id])
         self.env.execute_reservations()
         map_with_agents = self.env.get_map_with_agents()
         agent = self.env.agents[agent_id]
