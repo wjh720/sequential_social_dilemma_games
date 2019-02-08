@@ -106,11 +106,9 @@ def setup(env, hparams, num_cpus, num_gpus, num_agents, use_gpus_for_workers=Fal
 
     # hyperparams
     config.update({
-                "train_batch_size": 128,
+                "sample_batch_size": tune.grid_search([5, 10, 20]),
                 "horizon": 1000,
-                "lr_schedule":
-                [[0, hparams['lr_init']],
-                    [20000000, hparams['lr_final']]],
+                "lr": tune.grid_search([5e-5, 5e-4, 5e-3]),
                 "num_workers": num_workers,
                 "num_gpus": gpus_for_driver,  # The number of GPUs for the driver
                 "num_cpus_for_driver": cpus_for_driver,
