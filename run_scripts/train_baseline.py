@@ -114,7 +114,7 @@ def setup(env, hparams, num_cpus, num_gpus, num_agents, use_gpus_for_workers=Fal
                 "num_cpus_for_driver": cpus_for_driver,
                 "num_gpus_per_worker": num_gpus_per_worker,   # Can be a fraction
                 "num_cpus_per_worker": num_cpus_per_worker,   # Can be a fraction
-                "entropy_coeff": hparams['entropy_coeff'],
+                "entropy_coeff": tune.grid_search([-5e3, -5e4, -5e5]),
                 "multiagent": {
                     "policy_graphs": policy_graphs,
                     "policy_mapping_fn": tune.function(policy_mapping_fn),
@@ -145,7 +145,7 @@ def main(unused_argv):
             "stop": {
                 "training_iteration": 300000
             },
-            'checkpoint_freq': 1000,
+            'checkpoint_freq': 10000,
             "config": config,
         }
     })
