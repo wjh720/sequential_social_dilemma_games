@@ -108,7 +108,8 @@ def setup(env, hparams, num_cpus, num_gpus, num_agents, use_gpus_for_workers=Fal
     config.update({
                 "sample_batch_size": tune.grid_search([5, 10, 20]),
                 "horizon": 1000,
-                "lr": tune.grid_search([5e-5, 5e-4, 5e-3]),
+                "lr_schedule": [[0, tune.grid_search([5e-4, 5e-3])],
+                                [20000000, tune.grid_search([5e-4, 5e-5, 5e-6])]],
                 "num_workers": num_workers,
                 "num_gpus": gpus_for_driver,  # The number of GPUs for the driver
                 "num_cpus_for_driver": cpus_for_driver,
