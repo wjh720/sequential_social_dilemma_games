@@ -331,6 +331,9 @@ class MapEnv(MultiAgentEnv):
         fig = plt.figure()
         if filename is None and close_after is not None:
             # Add a timer to close the image after a delay
+            def close_event()
+                plt.close()
+
             timer = fig.canvas.new_timer(interval=close_after)
             timer.add_callback(close_event)
 
