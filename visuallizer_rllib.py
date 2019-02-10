@@ -142,7 +142,7 @@ def visualizer_rllib(args):
                 pdb.set_trace()
 
             if args.render:
-                env.render()
+                env.render(close_after=1000)
             if args.save_video:
                 rgb_arr = env.map_to_colors()
                 full_obs[j] = rgb_arr.astype(np.uint8)

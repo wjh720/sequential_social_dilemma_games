@@ -314,17 +314,31 @@ class MapEnv(MultiAgentEnv):
 
         return rgb_arr
 
-    def render(self, filename=None):
+    def render(self, filename=None, close_after=None):
         """ Creates an image of the map to plot or save.
 
         Args:
-            path: If a string is passed, will save the image
+            filename: If a string is passed, will save the image
                 to disk at this location.
+            close_after: If an integer is provided, will
+                automatically close the rendered image after
+                that many milliseconds.
         """
         map_with_agents = self.get_map_with_agents()
 
         rgb_arr = self.map_to_colors(map_with_agents)
+
+        fig = plt.figure()
+        if filename is None and close_after is not None:
+            # Add a timer to close the image after a delay
+            timer = fig.canvas.new_timer(interval=close_after)
+            timer.add_callback(close_event)
+
         plt.imshow(rgb_arr, interpolation='nearest')
+
+        if filename is None and close_after is not None:
+            timer.start()
+
         if filename is None:
             plt.show()
         else:
